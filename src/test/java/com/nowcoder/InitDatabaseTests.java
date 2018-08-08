@@ -59,7 +59,7 @@ public class InitDatabaseTests {
         User us = userDao.selectById(10);
         System.out.println(us);
 
-        userDao.deleteUserById(1);
+
         /*List<User> users = userDao.selectUser();*//*
         List<User> users = userDao.selectUserByLimit(2,5);
         for(User u:users){

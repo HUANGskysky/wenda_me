@@ -33,7 +33,7 @@ public class UserService {
 
     public Map<String,String> register(String username,String password){
         Map<String,String> map = new HashMap<>();
-        if(username==null){
+        if(StringUtils.isBlank(password)){
             map.put("msg","用户名不能为空");
             return map;
         }
@@ -102,7 +102,7 @@ public class UserService {
         now.setTime(3600*24*100+now.getTime());
         loginTicket.setExpired(now);
         loginTicket.setStatus(0);
-        loginTicket.setTicket(UUID.randomUUID().toString().replace("_",""));
+        loginTicket.setTicket(UUID.randomUUID().toString().replace("-",""));
         loginTicketDao.addTicket(loginTicket);
 
         return loginTicket.getTicket();
