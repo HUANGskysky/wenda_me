@@ -1,6 +1,8 @@
 package com.nowcoder.service;
 
+import com.nowcoder.dao.LoginTicketDao;
 import com.nowcoder.dao.UserDao;
+import com.nowcoder.model.LoginTicket;
 import com.nowcoder.model.User;
 import com.nowcoder.util.WendaUtil;
 import org.apache.commons.lang.StringUtils;
@@ -21,6 +23,10 @@ public class UserService {
 
     @Autowired
     UserDao userDao;
+
+    @Autowired
+    LoginTicketDao loginTicketDao;
+
     public User getUser(int id){
         return userDao.selectById(id);
     }
@@ -31,7 +37,7 @@ public class UserService {
             map.put("msg","用户名不能为空");
             return map;
         }
-        if(password==null){
+        if(StringUtils.isBlank(password)){
             map.put("msg","密码不能为空");
             return map;
         }
@@ -50,7 +56,12 @@ public class UserService {
         user.setPassword(WendaUtil.MD5(password+user.getSalt()));
         userDao.addUser(user);
 
+        String ticket = addLoginTicket(user.getId());
+        map.put("ticket",ticket);
+
         return map;
+
+
 
     }
 
@@ -73,8 +84,28 @@ public class UserService {
             map.put("msg","密码错误");
             return map;
         }
+        String ticket = addLoginTicket(user.getId());
+        map.put("ticket",ticket);
 
         return map;
+    }
+
+    public void logout(String ticket){
+        loginTicketDao.updateStatus(ticket,1);
+    }
+
+
+    public String addLoginTicket(int userId){
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(userId);
+        Date now = new Date();
+        now.setTime(3600*24*100+now.getTime());
+        loginTicket.setExpired(now);
+        loginTicket.setStatus(0);
+        loginTicket.setTicket(UUID.randomUUID().toString().replace("_",""));
+        loginTicketDao.addTicket(loginTicket);
+
+        return loginTicket.getTicket();
     }
 
 
